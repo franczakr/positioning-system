@@ -21,7 +21,7 @@ object BluetoothScanService {
     )
 
     private val settings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
         .setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
         .setReportDelay(0L)
         .build()
@@ -33,6 +33,7 @@ object BluetoothScanService {
             scanning.value = enable
             if (enable) {
                 Log.d("Start BT scan")
+//                bluetoothAdapter.bluetoothLeScanner.startScan(callback)
                 bluetoothAdapter.bluetoothLeScanner.startScan(filters, settings, callback)
             } else {
                 Log.d("Stop BT scan")
