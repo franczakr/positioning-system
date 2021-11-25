@@ -9,7 +9,7 @@ import org.airella.btposition.R
 import org.airella.btposition.databinding.ResultItemBinding
 import org.airella.btposition.utils.DistanceCalculator
 
-class BtResultAdapter(private val data: List<RssiResult>) : RecyclerView.Adapter<BtResultAdapter.ViewHolder>() {
+class RssiResultAdapter(private val data: List<RssiResult>) : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val description: TextView
@@ -36,7 +36,7 @@ class BtResultAdapter(private val data: List<RssiResult>) : RecyclerView.Adapter
 
         val text = """
             Name: ${device.name}
-            MAC: ${device.address}
+            MAC: ${device.mac}
             RSSI: $rssi
             Distance: $distance
             """

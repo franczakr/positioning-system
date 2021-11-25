@@ -12,10 +12,11 @@ open class ReadRssiBluetoothCallback : BluetoothGattCallback() {
 
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
+        Log.d("onConnectionStateChange")
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 runOnUiThread {
-                    gatt.discoverServices()
+                    gatt.readRemoteRssi()
                     onConnected()
                 }
             } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
@@ -33,10 +34,11 @@ open class ReadRssiBluetoothCallback : BluetoothGattCallback() {
 
     override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
         super.onReadRemoteRssi(gatt, rssi, status)
-        Log.d("Read device RSSI")
+        Log.d("onReadRemoteRssi")
         if (status == BluetoothGatt.GATT_SUCCESS) {
             runOnUiThread {
                 onSuccess(rssi)
+                onFinish()
             }
         } else {
             runOnUiThread {

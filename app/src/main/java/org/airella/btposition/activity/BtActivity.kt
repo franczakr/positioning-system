@@ -1,30 +1,31 @@
-package org.airella.btposition.acitivity
+package org.airella.btposition.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import org.airella.btposition.databinding.ActivityMainBinding
+import androidx.recyclerview.widget.LinearLayoutManager
+import org.airella.btposition.databinding.ActivityBtBinding
 
-class MainActivity : AppCompatActivity() {
+class BtActivity : AppCompatActivity() {
 
-    private val viewBinding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val viewBinding: ActivityBtBinding by lazy { ActivityBtBinding.inflate(layoutInflater) }
 
-    private lateinit var viewModel: MainActivityViewModel
+    private lateinit var viewModel: BtViewModel
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
-        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(BtViewModel::class.java)
 
-        viewModel.timeToUpdate.observe(this, {
-            viewBinding.timeToUpdate.text = "Time to update: $it"
+        viewModel.counter.observe(this, {
+            viewBinding.timeToUpdate.text = "Counter: $it"
         })
 
         viewBinding.results.adapter = viewModel.adapter
+        viewBinding.results.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onStart() {

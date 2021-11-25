@@ -1,4 +1,4 @@
-package org.airella.btposition.acitivity
+package org.airella.btposition.activity
 
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
@@ -12,19 +12,20 @@ import org.airella.btposition.bt.BluetoothScanService
 import org.airella.btposition.bt.BluetoothService
 import org.airella.btposition.bt.ReadRssiBluetoothCallback
 import org.airella.btposition.model.RssiResult
-import org.airella.btposition.model.BtResultAdapter
+import org.airella.btposition.model.RssiResultAdapter
+import org.airella.btposition.model.Device
 import org.airella.btposition.utils.Log
 import java.util.*
 
-class MainActivityViewModel : ViewModel() {
+class BtViewModel : ViewModel() {
 
-    val timeToUpdate: MutableLiveData<Int> = MutableLiveData(0)
+    val counter: MutableLiveData<Int> = MutableLiveData(0)
 
     private val results = arrayListOf<RssiResult>()
 
-    val adapter: BtResultAdapter = BtResultAdapter(results)
+    val adapter: RssiResultAdapter = RssiResultAdapter(results)
 
-    val sensors: ArrayList<BluetoothDevice> = arrayListOf()
+    val sensors: MutableSet<BluetoothDevice> = mutableSetOf()
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
@@ -46,8 +47,8 @@ class MainActivityViewModel : ViewModel() {
     }
 
     private fun addScanResult(result: ScanResult) {
-        results.add(RssiResult(result.device, result.rssi))
-        adapter.notifyItemInserted(results.size - 1)
+        results.add(0, RssiResult(Device(result.device.name, result.device.address), result.rssi))
+        adapter.notifyItemInserted(0)
         sensors.add(result.device)
     }
 
@@ -76,15 +77,18 @@ class MainActivityViewModel : ViewModel() {
             BluetoothService.connectGatt(sensor, object : ReadRssiBluetoothCallback() {
                 override fun onSuccess(rssi: Int) {
                     super.onSuccess(rssi)
-                    results.add(RssiResult(sensor, rssi))
+                    results.add(RssiResult(Device(sensor.name, sensor.address), rssi))
+                    adapter.notifyDataSetChanged()
+                    Log.e(rssi.toString())
                 }
             })
         }
     }
 
-    private val timer = Timer()
+    private var timer: Timer = Timer()
 
     fun startScanTimer(activity: Activity) {
+        timer = Timer()
         timer.schedule(
             object : TimerTask() {
                 override fun run() {
@@ -103,21 +107,24 @@ class MainActivityViewModel : ViewModel() {
     }
 
     private fun eachSecondTimer(activity: Activity) {
-        when (timeToUpdate.value) {
+        when (counter.value) {
             0 -> {
                 startBtScan(activity)
             }
             1,2,3 -> {}
             4 -> {
                 stopBtScan(activity)
+                readSensorsRSSI(activity)
             }
             else -> {
-//                readSensorsRSSI(activity)
+                readSensorsRSSI(activity)
             }
         }
-        timeToUpdate.value = timeToUpdate.value!! + 1
-        if(timeToUpdate.value == 6) {
-            timeToUpdate.value = 0
+        counter.value = counter.value!! + 1
+        if(counter.value == 10) {
+            counter.value = 0
+            results.clear()
+            adapter.notifyDataSetChanged()
         }
     }
 }

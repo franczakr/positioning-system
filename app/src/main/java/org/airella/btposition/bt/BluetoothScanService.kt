@@ -21,8 +21,8 @@ object BluetoothScanService {
     )
 
     private val settings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
-        .setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
         .setReportDelay(0L)
         .build()
 
@@ -33,10 +33,10 @@ object BluetoothScanService {
             scanning.value = enable
             if (enable) {
                 Log.d("Start BT scan")
-//                bluetoothAdapter.bluetoothLeScanner.startScan(callback)
                 bluetoothAdapter.bluetoothLeScanner.startScan(filters, settings, callback)
             } else {
                 Log.d("Stop BT scan")
+                bluetoothAdapter.bluetoothLeScanner.flushPendingScanResults(callback)
                 bluetoothAdapter.bluetoothLeScanner.stopScan(callback)
             }
         } catch (e: NullPointerException) {

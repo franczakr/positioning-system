@@ -3,6 +3,7 @@ package org.airella.btposition.bt
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import org.airella.btposition.MyApplication
+import org.airella.btposition.utils.Log
 import java.util.*
 
 object BluetoothService {
@@ -14,6 +15,7 @@ object BluetoothService {
     private val tasksQueue: Queue<Pair<BluetoothDevice, ReadRssiBluetoothCallback>> = LinkedList()
 
     fun connectGatt(btDevice: BluetoothDevice, callback: ReadRssiBluetoothCallback) {
+        Log.d("connectGatt")
         synchronized(isConnected) {
             if (!isConnected) {
                 isConnected = true
@@ -53,3 +55,41 @@ object BluetoothService {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
