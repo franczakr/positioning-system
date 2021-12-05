@@ -52,7 +52,7 @@ class WifiViewModel : ViewModel() {
             object : TimerTask() {
                 override fun run() {
                     activity.runOnUiThread {
-                        eachSecondTimer(activity)
+//                        eachSecondTimer(activity)
                     }
                 }
             },
@@ -65,25 +65,25 @@ class WifiViewModel : ViewModel() {
         timer.cancel()
     }
 
-    private fun eachSecondTimer(activity: Activity) {
-        when (counter.value) {
-            0 -> {
-                startBtScan(activity)
-            }
-            1,2,3 -> {}
-            4 -> {
-                stopBtScan(activity)
-                readSensorsRSSI(activity)
-            }
-            else -> {
-                readSensorsRSSI(activity)
-            }
-        }
-        counter.value = counter.value!! + 1
-        if(counter.value == 10) {
-            counter.value = 0
-            results.clear()
-            adapter.notifyDataSetChanged()
-        }
-    }
+//    private fun eachSecondTimer(activity: Activity) {
+//        when (counter.value) {
+//            0 -> {
+//                startBtScan(activity)
+//            }
+//            1,2,3 -> {}
+//            4 -> {
+//                stopBtScan(activity)
+//                readSensorsRSSI(activity)
+//            }
+//            else -> {
+//                readSensorsRSSI(activity)
+//            }
+//        }
+//        counter.value = counter.value!! + 1
+//        if(counter.value == 10) {
+//            counter.value = 0
+//            results.clear()
+//            adapter.notifyDataSetChanged()
+//        }
+//    }
 }
