@@ -1,47 +1,26 @@
 package org.airella.btposition.activity
 
-import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.net.wifi.rtt.RangingRequest
-import android.net.wifi.rtt.RangingResult
-import android.net.wifi.rtt.RangingResultCallback
-import android.net.wifi.rtt.WifiRttManager
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import org.airella.btposition.bt.BluetoothScanService
-import org.airella.btposition.bt.BluetoothService
-import org.airella.btposition.bt.ReadRssiBluetoothCallback
+import org.airella.btposition.model.Device
 import org.airella.btposition.model.RssiResult
 import org.airella.btposition.model.RssiResultAdapter
-import org.airella.btposition.model.Device
-import org.airella.btposition.utils.Log
 import java.util.*
 
 class WifiViewModel : ViewModel() {
 
     val counter: MutableLiveData<Int> = MutableLiveData(0)
 
-    private val results = arrayListOf<RssiResult>()
-
-    val adapter: RssiResultAdapter = RssiResultAdapter(results)
+    val adapter: RssiResultAdapter = RssiResultAdapter()
 
     val sensors: MutableSet<BluetoothDevice> = mutableSetOf()
 
 
     private fun addScanResult(result: ScanResult) {
-        results.add(0, RssiResult(Device(result.device.name, result.device.address), result.rssi))
-        adapter.notifyItemInserted(0)
-        sensors.add(result.device)
+        adapter.addItem(RssiResult(Device(result.device.name, result.device.address), result.rssi))
     }
 
     private var timer: Timer = Timer()

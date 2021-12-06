@@ -1,11 +1,14 @@
 package org.airella.btposition.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.airella.btposition.databinding.ActivityBtBinding
+import org.airella.btposition.utils.Log
 
 class BtActivity : AppCompatActivity() {
 
@@ -20,22 +23,25 @@ class BtActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(BtViewModel::class.java)
 
-        viewModel.counter.observe(this, {
-            viewBinding.timeToUpdate.text = "Counter: $it"
-        })
-
         viewBinding.results.adapter = viewModel.adapter
         viewBinding.results.layoutManager = LinearLayoutManager(this)
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 2137)
+        } else {
+            Log.i("Permission already granted")
+        }
+
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.startScanTimer(this)
+        viewModel.startBtScan(this)
     }
 
     override fun onStop() {
         super.onStop()
-        viewModel.stopScanTimer()
+        viewModel.stopBtScan(this)
     }
 
 }

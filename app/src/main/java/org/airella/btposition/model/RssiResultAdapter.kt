@@ -9,9 +9,11 @@ import org.airella.btposition.R
 import org.airella.btposition.databinding.ResultItemBinding
 import org.airella.btposition.utils.DistanceCalculator
 
-class RssiResultAdapter(private val data: List<RssiResult>) : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
+class RssiResultAdapter : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    private val data: MutableList<RssiResult> = mutableListOf()
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val description: TextView
 
         init {
@@ -45,4 +47,16 @@ class RssiResultAdapter(private val data: List<RssiResult>) : RecyclerView.Adapt
     }
 
     override fun getItemCount(): Int = data.size
+
+    fun addItem(rssiResult: RssiResult) {
+        val index: Int = data.map { it.device }.indexOf(rssiResult.device)
+        if (index != -1) {
+            data[index] = rssiResult
+            notifyItemChanged(index)
+        } else {
+            data.add(rssiResult)
+            data.sortBy { it.device.name }
+            notifyDataSetChanged()
+        }
+    }
 }
