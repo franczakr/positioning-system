@@ -4,21 +4,21 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import org.airella.btposition.bt.BluetoothScanService
 import org.airella.btposition.model.Device
-import org.airella.btposition.model.RssiResult
+import org.airella.btposition.model.DistanceMeasurements
+import org.airella.btposition.model.DistanceResult
 import org.airella.btposition.model.RssiResultAdapter
 import org.airella.btposition.utils.Log
 
 class BtViewModel : ViewModel() {
 
-    val counter: MutableLiveData<Int> = MutableLiveData(0)
+    val devices: MutableMap<String, Device> = mutableMapOf()
 
-    val adapter: RssiResultAdapter = RssiResultAdapter()
+    val measurements: DistanceMeasurements = DistanceMeasurements()
 
-//    val sensors: MutableSet<BluetoothDevice> = mutableSetOf()
+    val adapter: RssiResultAdapter = RssiResultAdapter(measurements)
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
@@ -40,8 +40,14 @@ class BtViewModel : ViewModel() {
     }
 
     private fun addScanResult(result: ScanResult) {
-        adapter.addItem(RssiResult(Device(result.device.name, result.device.address), result.rssi))
-//        sensors.add(result.device)
+        val mac = result.device.address
+
+        if (!devices.containsKey(mac)) {
+            devices[mac] = Device(result.device.name, mac)
+        } else {
+            val itemChanged = measurements.addItem(DistanceResult(devices[mac]!!, result.rssi))
+            adapter.notifyItemChanged(itemChanged)
+        }
     }
 
     fun startBtScan(context: Context) {
@@ -63,59 +69,4 @@ class BtViewModel : ViewModel() {
             Toast.makeText(context, "BT disabled", Toast.LENGTH_SHORT).show()
         }
     }
-
-//    private fun readSensorsRSSI(context: Context) {
-//        sensors.forEach { sensor ->
-//            BluetoothService.connectGatt(sensor, object : ReadRssiBluetoothCallback() {
-//                override fun onSuccess(rssi: Int) {
-//                    super.onSuccess(rssi)
-//                    adapter.addItem(RssiResult(Device(sensor.name, sensor.address), rssi))
-//                    Log.e(rssi.toString())
-//                }
-//            })
-//        }
-//    }
-
-//    private var timer: Timer = Timer()
-//
-//    fun startScanTimer(activity: Activity) {
-//        timer = Timer()
-//        timer.schedule(
-//            object : TimerTask() {
-//                override fun run() {
-//                    activity.runOnUiThread {
-//                        eachSecondTimer(activity)
-//                    }
-//                }
-//            },
-//            0L,
-//            1000L
-//        )
-//    }
-
-//    fun stopScanTimer() {
-//        timer.cancel()
-//    }
-
-//    private fun eachSecondTimer(activity: Activity) {
-//        when (counter.value) {
-//            0 -> {
-//                startBtScan(activity)
-//            }
-////            1, 2, 3 -> {
-////            }
-////            1 -> {
-////                stopBtScan(activity)
-//////                readSensorsRSSI(activity)
-////            }
-////            else -> {
-//////                readSensorsRSSI(activity)
-////            }
-//        }
-//        counter.value = counter.value!! + 1
-//        if (counter.value == 10) {
-//            counter.value = 0
-//            adapter.notifyDataSetChanged()
-//        }
-//    }
 }

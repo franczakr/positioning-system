@@ -1,6 +1,8 @@
 package org.airella.btposition.model
 
-data class Device(val name: String?, val mac: String?) {
+import org.airella.btposition.activity.CanvasView
+
+data class Device(val name: String?, val mac: String?, var position: CanvasView.Position? = null) {
 
 
     override fun hashCode(): Int {
@@ -17,4 +19,6 @@ data class Device(val name: String?, val mac: String?) {
 
         return true
     }
+
+    fun isConfigured() = position != null
 }
