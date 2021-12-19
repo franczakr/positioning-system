@@ -3,14 +3,17 @@ package org.airella.btposition.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
-import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.airella.btposition.databinding.ActivityBtBinding
+import org.airella.btposition.databinding.DeviceItemBinding
+import org.airella.btposition.model.Device
 import org.airella.btposition.utils.Log
 
 class BtActivity : AppCompatActivity() {
@@ -35,20 +38,6 @@ class BtActivity : AppCompatActivity() {
             Log.i("Permission already granted")
         }
 
-        viewBinding.canvas.setVisualDebug(false)
-        viewBinding.canvas.setMargin(0.05f)
-        viewBinding.canvas.setColor1(Color.parseColor("#A2142F"))
-        viewBinding.canvas.setColor2(Color.parseColor("#4DBEEE"))
-        viewBinding.canvas.setColor3(Color.parseColor("#77AC30"))
-        assignListenerToSeekBar(viewBinding.x1, viewBinding.canvas::setX1, 1f)
-        assignListenerToSeekBar(viewBinding.y1, viewBinding.canvas::setY1, 1f)
-        assignListenerToSeekBar(viewBinding.s1, viewBinding.canvas::setSignal1, 2f)
-        assignListenerToSeekBar(viewBinding.x2, viewBinding.canvas::setX2, 1f)
-        assignListenerToSeekBar(viewBinding.y2, viewBinding.canvas::setY2, 1f)
-        assignListenerToSeekBar(viewBinding.s2, viewBinding.canvas::setSignal2, 2f)
-        assignListenerToSeekBar(viewBinding.x3, viewBinding.canvas::setX3, 1f)
-        assignListenerToSeekBar(viewBinding.y3, viewBinding.canvas::setY3, 2f)
-        assignListenerToSeekBar(viewBinding.s3, viewBinding.canvas::setSignal3, 2f)
     }
 
     override fun onStart() {
@@ -61,14 +50,60 @@ class BtActivity : AppCompatActivity() {
         viewModel.stopBtScan(this)
     }
 
-    fun assignListenerToSeekBar(seekBar: SeekBar, setter: (Float) -> Unit, maxValue: Float) {
-        val seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                setter(progress / 100f * maxValue)
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar) { }
-            override fun onStopTrackingTouch(seekBar: SeekBar) { }
+    fun configureSensors(view: View) {
+        val devices = viewModel.devices.values.toMutableList()
+        if (devices.size < 3) {
+
+            devices.add(devices[0])
+            devices.add(devices[0])
+//            Toast.makeText(this, "Three sensors needed, ${devices.size} found", Toast.LENGTH_SHORT)
+//                .show()
+//            return
         }
-        seekBar.setOnSeekBarChangeListener(seekBarChangeListener)
+
+        val devicesConfigBinding = DeviceItemBinding.inflate(LayoutInflater.from(this))
+
+        devicesConfigBinding.device1Description.text = getDeviceDesc(devices[0])
+        devicesConfigBinding.device2Description.text = getDeviceDesc(devices[1])
+        devicesConfigBinding.device3Description.text = getDeviceDesc(devices[2])
+
+        AlertDialog.Builder(this)
+            .setView(devicesConfigBinding.root)
+            .setPositiveButton("Save") { _, _ ->
+                setPosition(
+                    devices[0],
+                    devicesConfigBinding.device1X,
+                    devicesConfigBinding.device1Y
+                )
+                setPosition(
+                    devices[1],
+                    devicesConfigBinding.device2X,
+                    devicesConfigBinding.device2Y
+                )
+                setPosition(
+                    devices[2],
+                    devicesConfigBinding.device3X,
+                    devicesConfigBinding.device3Y
+                )
+                if (viewModel.devices.values.all { it.isConfigured() }) {
+                    viewModel.initCanvas()
+                }
+            }
+            .create()
+            .show()
     }
+
+    private fun setPosition(device: Device, xEditText: EditText, yEditText: EditText) {
+        val x = xEditText.text.toString().toFloatOrNull()
+        val y = yEditText.text.toString().toFloatOrNull()
+        if (x != null && y != null) {
+            device.position = CanvasView.Position(x, y)
+        }
+    }
+
+    private fun getDeviceDesc(device: Device) =
+        """
+           Name: ${device.name}
+           MAC: ${device.mac}""".trimIndent()
+
 }

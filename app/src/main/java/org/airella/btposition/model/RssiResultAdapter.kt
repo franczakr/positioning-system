@@ -7,11 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.airella.btposition.R
 import org.airella.btposition.databinding.ResultItemBinding
-import org.airella.btposition.utils.DistanceCalculator
 
-class RssiResultAdapter : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
-
-    private val data: MutableList<RssiResult> = mutableListOf()
+class RssiResultAdapter(private val data: DistanceMeasurements) :
+    RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val description: TextView
@@ -30,11 +28,10 @@ class RssiResultAdapter : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val btResult = data[position]
+        val btResult = data.measurements[position]
         val device = btResult.device
         val rssi = btResult.rssi
-
-        val distance = DistanceCalculator.calculateDistance(rssi)
+        val distance = btResult.distance
 
         val text = """
             Name: ${device.name}
@@ -46,17 +43,6 @@ class RssiResultAdapter : RecyclerView.Adapter<RssiResultAdapter.ViewHolder>() {
         holder.description.text = text
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = data.measurements.size
 
-    fun addItem(rssiResult: RssiResult) {
-        val index: Int = data.map { it.device }.indexOf(rssiResult.device)
-        if (index != -1) {
-            data[index] = rssiResult
-            notifyItemChanged(index)
-        } else {
-            data.add(rssiResult)
-            data.sortBy { it.device.name }
-            notifyDataSetChanged()
-        }
-    }
 }

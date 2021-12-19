@@ -12,7 +12,7 @@ object DistanceCalculator {
     private const val txPower = -59  // one meter power
     private const val N = 2 // Constant depends on the Environmental factor
 
-    fun calculateDistance(rssi: Int): Double {
-        return 10.0.pow((txPower - rssi) / (10.0 * N))
+    fun calculateDistance(rssi: Int): Float {
+        return 10.0.pow((txPower - rssi) / (10.0 * N)).toFloat()
     }
 }

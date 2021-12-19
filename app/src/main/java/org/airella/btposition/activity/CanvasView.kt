@@ -67,48 +67,24 @@ class CanvasView @JvmOverloads constructor(context: Context,
     // -> input signal - strength of signal in meters
 
     private var inputX1 = 0f
-    fun setX1(value: Float) {
-        inputX1 = value
-        invalidate()
-    }
     private var inputY1 = 0f
-    fun setY1(value: Float) {
-        inputY1 = value
-        invalidate()
-    }
     private var inputSignal1 = 0.8f
-    fun setSignal1(value: Float) {
-        inputSignal1 = value
-        invalidate()
-    }
+
     private var inputX2 = 1f
-    fun setX2(value: Float) {
-        inputX2 = value
-        invalidate()
-    }
     private var inputY2 = 0f
-    fun setY2(value: Float) {
-        inputY2 = value
-        invalidate()
-    }
     private var inputSignal2 = 0.7f
-    fun setSignal2(value: Float) {
-        inputSignal2 = value
-        invalidate()
-    }
+
     private var inputX3 = 0.5f
-    fun setX3(value: Float) {
-        inputX3 = value
-        invalidate()
-    }
     private var inputY3 = 1f
-    fun setY3(value: Float) {
-        inputY3 = value
-        invalidate()
-    }
     private var inputSignal3 = 0.8f
-    fun setSignal3(value: Float) {
-        inputSignal3 = value
+
+    fun setPositions(pos1: Position, pos2: Position, pos3: Position) {
+        inputX1 = pos1.x
+        inputY1 = pos1.y
+        inputX2 = pos2.x
+        inputY2 = pos2.y
+        inputX3 = pos3.x
+        inputY3 = pos3.y
         invalidate()
     }
 
