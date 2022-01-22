@@ -69,4 +69,8 @@ class BtViewModel : ViewModel() {
             Toast.makeText(context, "BT disabled", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun initCanvas() {
+//        can
+    }
 }

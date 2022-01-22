@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -54,9 +53,12 @@ class BtActivity : AppCompatActivity() {
     fun configureSensors(view: View) {
         val devices = viewModel.devices.values.toMutableList()
         if (devices.size < 3) {
-            Toast.makeText(this, "Three sensors needed, ${devices.size} found", Toast.LENGTH_SHORT)
-                .show()
-            return
+
+            devices.add(devices[0])
+            devices.add(devices[0])
+//            Toast.makeText(this, "Three sensors needed, ${devices.size} found", Toast.LENGTH_SHORT)
+//                .show()
+//            return
         }
 
         val devicesConfigBinding = DeviceItemBinding.inflate(LayoutInflater.from(this))
@@ -83,15 +85,20 @@ class BtActivity : AppCompatActivity() {
                     devicesConfigBinding.device3X,
                     devicesConfigBinding.device3Y
                 )
+                if (viewModel.devices.values.all { it.isConfigured() }) {
+                    viewModel.initCanvas()
+                }
             }
             .create()
             .show()
     }
 
     private fun setPosition(device: Device, xEditText: EditText, yEditText: EditText) {
-        val x = xEditText.text.toString().toFloatOrNull() ?: 0f
-        val y = yEditText.text.toString().toFloatOrNull() ?: 0f
-        device.position = CanvasView.Position(x, y)
+        val x = xEditText.text.toString().toFloatOrNull()
+        val y = yEditText.text.toString().toFloatOrNull()
+        if (x != null && y != null) {
+            device.position = CanvasView.Position(x, y)
+        }
     }
 
     private fun getDeviceDesc(device: Device) =
