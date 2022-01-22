@@ -2,16 +2,15 @@ package org.airella.btposition.model
 
 class DistanceMeasurements {
 
-    val measurements: MutableList<DistanceResult> = mutableListOf()
+    val measurements: MutableMap<Device, DistanceResult> = mutableMapOf()
 
-    fun addItem(rssiResult: DistanceResult): Int {
-        val index: Int = measurements.map { it.device }.indexOf(rssiResult.device)
-        if (index != -1) {
-            measurements[index] = rssiResult
-            return index
+    fun values(): List<DistanceResult> = measurements.values.toList()
+
+    fun addItem(device: Device, distance: Float) {
+        if (measurements.containsKey(device)) {
+            measurements[device]!!.addDistanceMeasurement(distance)
         } else {
-            measurements.add(0, rssiResult)
-            return 0
+            measurements[device] = DistanceResult(device)
         }
     }
 }

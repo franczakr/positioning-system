@@ -1,9 +1,11 @@
 package org.airella.btposition.model
 
-import org.airella.btposition.activity.CanvasView
+import android.net.wifi.ScanResult
+import org.airella.btposition.view.CanvasView
 
-data class Device(val name: String?, val mac: String?, var position: CanvasView.Position? = null) {
+data class Device(var name: String?, val mac: String?, var position: CanvasView.Position? = null, var scanResult: ScanResult? = null) {
 
+    constructor(scanResult: ScanResult, position: CanvasView.Position?) : this(scanResult.SSID, scanResult.BSSID, position, scanResult)
 
     override fun hashCode(): Int {
         return mac?.hashCode() ?: 0

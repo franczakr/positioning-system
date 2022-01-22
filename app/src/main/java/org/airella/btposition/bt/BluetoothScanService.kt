@@ -25,7 +25,7 @@ object BluetoothScanService {
     private val settings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-        .setReportDelay(500L)
+        .setReportDelay(200L)
         .build()
 
     fun scanBTDevices(callback: ScanCallback, enable: Boolean) {

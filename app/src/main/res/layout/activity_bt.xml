@@ -6,11 +6,6 @@
     android:orientation="vertical"
     tools:context=".activity.BtActivity">
 
-   <androidx.recyclerview.widget.RecyclerView
-       android:id="@+id/results"
-       android:layout_width="match_parent"
-       android:layout_height="100dp" />
-
    <Button
        android:id="@+id/config_button"
        android:layout_width="match_parent"
@@ -19,7 +14,8 @@
        android:text="Configure sensors"
        android:onClick="configureSensors" />
 
-   <org.airella.btposition.activity.CanvasView
+   <org.airella.btposition.view.CanvasView
+       android:id="@+id/canvas"
        android:layout_width="match_parent"
        android:layout_height="match_parent" />
 

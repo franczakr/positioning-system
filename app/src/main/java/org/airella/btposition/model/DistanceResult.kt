@@ -1,14 +1,20 @@
 package org.airella.btposition.model
 
-import org.airella.btposition.utils.DistanceCalculator
+import java.util.*
 
-data class DistanceResult(val device: Device, val distance: Float, val rssi: Int? = null) {
+data class DistanceResult(val device: Device) {
 
-    constructor(device: Device, rssi: Int) : this(
-        device,
-        DistanceCalculator.calculateDistance(rssi),
-        rssi
-    )
+    private val lastMeasuresCountForAverage = 20
 
-    fun position() = device.position
+    private val distanceMeasurements: LinkedList<Float> = LinkedList()
+
+    fun distance(): Float = distanceMeasurements.average().toFloat()
+
+    fun addDistanceMeasurement(distanceMeasurement: Float) {
+        distanceMeasurements.addLast(distanceMeasurement)
+
+        if(distanceMeasurements.size > lastMeasuresCountForAverage) {
+            distanceMeasurements.removeFirst()
+        }
+    }
 }

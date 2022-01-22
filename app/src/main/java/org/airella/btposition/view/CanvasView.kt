@@ -1,10 +1,11 @@
-package org.airella.btposition.activity
+package org.airella.btposition.view
 
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
+import org.airella.btposition.model.DistanceResult
 import kotlin.math.*
 
 
@@ -33,7 +34,7 @@ class CanvasView @JvmOverloads constructor(context: Context,
     private val resultColor = Color.parseColor("#7E2F8E")
 
     // set to false to hide debug lines
-    private var visualDebug = true
+    private var visualDebug = false
     fun setVisualDebug(value: Boolean) {
         visualDebug = value
         invalidate()
@@ -66,32 +67,44 @@ class CanvasView @JvmOverloads constructor(context: Context,
     // -> input x and input y - position of sensor 1 and sensor 2 in meters
     // -> input signal - strength of signal in meters
 
+    private var isConfigured: Boolean = false
+
     private var inputX1 = 0f
     private var inputY1 = 0f
-    private var inputSignal1 = 0.8f
+    private var inputSignal1 = 0f
 
-    private var inputX2 = 1f
+    private var inputX2 = 0f
     private var inputY2 = 0f
-    private var inputSignal2 = 0.7f
+    private var inputSignal2 = 0f
 
-    private var inputX3 = 0.5f
-    private var inputY3 = 1f
-    private var inputSignal3 = 0.8f
+    private var inputX3 = 0f
+    private var inputY3 = 0f
+    private var inputSignal3 = 0f
 
-    fun setPositions(pos1: Position, pos2: Position, pos3: Position) {
-        inputX1 = pos1.x
-        inputY1 = pos1.y
-        inputX2 = pos2.x
-        inputY2 = pos2.y
-        inputX3 = pos3.x
-        inputY3 = pos3.y
+    fun setMeasurements(measurements: List<DistanceResult>) {
+        measurements[0].let {
+            inputX1 = it.device.position!!.x
+            inputY1 = it.device.position!!.y
+            inputSignal1 = it.distance()
+        }
+        measurements[1].let {
+            inputX2 = it.device.position!!.x
+            inputY2 = it.device.position!!.y
+            inputSignal2 = it.distance()
+        }
+        measurements[2].let {
+            inputX3 = it.device.position!!.x
+            inputY3 = it.device.position!!.y
+            inputSignal3 = it.distance()
+        }
+        isConfigured = true
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        if (canvas == null)
+        if (canvas == null || !isConfigured)
             return
 
         val pointData = translateCoords(canvas)
@@ -127,7 +140,7 @@ class CanvasView @JvmOverloads constructor(context: Context,
         drawPoint(canvas, resultColor, Point(resultPoint.x, resultPoint.y, signalPointsSize))
     }
 
-    fun translateCoords(canvas: Canvas): PointData {
+    private fun translateCoords(canvas: Canvas): PointData {
         val canvasWidth = canvas.width.toFloat()
         val canvasHeight = canvas.height.toFloat()
         val minX = min(inputX1, min(inputX2, inputX3))
@@ -155,11 +168,11 @@ class CanvasView @JvmOverloads constructor(context: Context,
         )
     }
 
-    fun distance2d(x1: Float, x2: Float, y1: Float, y2: Float): Float {
+    private fun distance2d(x1: Float, x2: Float, y1: Float, y2: Float): Float {
         return sqrt((x1 - x2).pow(2) + (y1 - y2).pow(2))
     }
 
-    fun getDistance(midPoint: Position, intersections: Intersections): Float {
+    private fun getDistance(midPoint: Position, intersections: Intersections): Float {
         val distance: (Float, Float) -> Float = { x, y -> distance2d(midPoint.x, x, midPoint.y, y) }
         if (intersections.outsideResult != null) {
             return distance(intersections.outsideResult.x, intersections.outsideResult.y)
@@ -170,7 +183,7 @@ class CanvasView @JvmOverloads constructor(context: Context,
         } else return Float.NaN
     }
 
-    fun getAndDrawLineIntersections(canvas: Canvas, line1: Line, line2: Line, color: Int): Position {
+    private fun getAndDrawLineIntersections(canvas: Canvas, line1: Line, line2: Line, color: Int): Position {
         val x: Float
         val y: Float
 
@@ -196,7 +209,7 @@ class CanvasView @JvmOverloads constructor(context: Context,
     fun getAndDrawApproxLine(canvas: Canvas, intersections: Intersections, circle1: Point, circle2: Point, color: Int): Line {
         val width = canvas.width.toFloat()
         val height = canvas.height.toFloat()
-        var result: Line
+        val result: Line
 
         val point1 = intersections.result1
         val point2 = intersections.result2
